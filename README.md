@@ -22,21 +22,23 @@ Open source AI-powered Slack community management bot with a built-in Next.js ad
 Try the admin panel without setting up Slack:
 
 1. Import the repo on [vercel.com/new](https://vercel.com/new)
-2. Add a `COMMUNITY_NAME` env var (e.g. `DevHub`)
+2. Add `ADMIN_DEMO_MODE=true` and a `COMMUNITY_NAME` env var (e.g. `DevHub`)
 3. Deploy—the dashboard works immediately with mock data
+
+`ADMIN_DEMO_MODE` bypasses admin auth and is only for previewing the template. Remove it before connecting a real Slack workspace.
 
 For the full Slack bot setup, see [docs/setup.md](docs/setup.md).
 
 ## Customization
 
-| What to change  | File                                                      | Details                                   |
-| --------------- | --------------------------------------------------------- | ----------------------------------------- |
-| Bot personality | [`lib/agent.ts`](lib/agent.ts)                            | System prompt and instructions           |
-| Channel map     | [`lib/channels.ts`](lib/channels.ts)                      | Must match your Slack workspace          |
-| Welcome message | [`lib/welcome.ts`](lib/welcome.ts)                        | Sent when new members join               |
-| Agent tools     | [`workflows/agent-workflow/tools.ts`](workflows/agent-workflow/tools.ts) | Add, remove, or modify tools             |
-| Auth config     | [`lib/auth.ts`](lib/auth.ts)                              | Slack OAuth for the admin panel          |
-| Action type UI  | [`config/type-config.ts`](config/type-config.ts)          | Icons, labels, and colors per action type|
+| What to change  | File                                                                         | Details                                   |
+| --------------- | ---------------------------------------------------------------------------- | ----------------------------------------- |
+| Bot personality | [`lib/agent.ts`](lib/agent.ts)                                               | System prompt and instructions           |
+| Channel map     | [`lib/channels.ts`](lib/channels.ts)                                         | Must match your Slack workspace          |
+| Welcome message | [`lib/welcome.ts`](lib/welcome.ts)                                           | Sent when new members join               |
+| Agent tools     | [`workflows/agent-workflow/tools.ts`](workflows/agent-workflow/tools.ts)     | Add, remove, or modify tools             |
+| Auth config     | [`lib/auth.ts`](lib/auth.ts)                                                 | Slack OAuth for the admin panel          |
+| Action type UI  | [`config/type-config.ts`](config/type-config.ts)                             | Icons, labels, and colors per action type |
 
 ### Knowledge base
 

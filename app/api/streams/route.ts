@@ -1,5 +1,5 @@
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
+import { shouldUseMockActivity } from "@/data/queries/activity-source";
+import { getCurrentSession } from "@/data/queries/auth";
 import {
   getActiveStreams,
   hasActionForThread,
@@ -7,11 +7,11 @@ import {
 } from "@/lib/store";
 
 export async function GET() {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getCurrentSession();
   if (!session) {
     return Response.json([], { status: 401 });
   }
-  if (!isStoreConfigured()) {
+  if (shouldUseMockActivity() || !isStoreConfigured()) {
     return Response.json([]);
   }
 

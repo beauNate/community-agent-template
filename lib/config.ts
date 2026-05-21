@@ -1,4 +1,11 @@
+function isEnabled(value: string | undefined): boolean {
+  return value
+    ? ["1", "true", "yes", "on"].includes(value.toLowerCase())
+    : false;
+}
+
 export const config = {
+  adminDemoMode: isEnabled(process.env.ADMIN_DEMO_MODE),
   communityName: process.env.COMMUNITY_NAME || "Your Community",
   model: process.env.AI_MODEL || "anthropic/claude-sonnet-4-20250514",
   slackWorkspaceUrl: process.env.SLACK_WORKSPACE_URL || "",

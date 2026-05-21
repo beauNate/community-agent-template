@@ -1,16 +1,14 @@
-import { headers } from "next/headers";
 import { cache } from "react";
-import { mockActions, mockConversations } from "@/data/mock/activity";
-import { auth, isCurrentUserLead } from "@/lib/auth";
+import { isCurrentUserLead } from "@/lib/auth";
 import {
-  getLastSeen,
-  getThreadKeyForAction,
-  isStoreConfigured,
-  getActionById as storeGetActionById,
-  getConversation as storeGetConversation,
-  getRecentActions as storeGetRecentActions,
-  getStats as storeGetStats,
-} from "@/lib/store";
+  getActivityActionById,
+  getActivityActions,
+  getActivityChannelCounts,
+  getActivityConversation,
+  getActivityLastSeen,
+  getActivityStats,
+  getActivityThreadKey,
+} from "./activity-source";
 import type {
   AnalyticsBucket,
   AnalyticsData,
@@ -19,42 +17,24 @@ import type {
   ConversationMessage,
   DashboardStats,
 } from "@/lib/types";
-import { requireSession } from "./auth";
-
-const LEADING_HASH_RE = /^#/;
-
-const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
+import { getCurrentSession, requireSession } from "./auth";
 
 export const getRecentActions = cache(async (): Promise<BotAction[]> => {
   await requireSession();
-  if (!isStoreConfigured()) {
-    await delay(2000);
-    return [...mockActions].sort(
-      (a, b) => (b.lastUpdated ?? b.timestamp) - (a.lastUpdated ?? a.timestamp)
-    );
-  }
-  return storeGetRecentActions(500);
+  return getActivityActions();
 });
 
 export const getActionById = cache(
   async (id: string): Promise<BotAction | null> => {
     await requireSession();
-    if (!isStoreConfigured()) {
-      await delay(500);
-      return mockActions.find((a) => a.id === id) ?? null;
-    }
-    return storeGetActionById(id);
+    return getActivityActionById(id);
   }
 );
 
 export const getConversation = cache(
   async (actionId: string): Promise<ConversationMessage[]> => {
     await requireSession();
-    if (!isStoreConfigured()) {
-      await delay(500);
-      return mockConversations[actionId] || [];
-    }
-    return storeGetConversation(actionId);
+    return getActivityConversation(actionId);
   }
 );
 
@@ -70,7 +50,7 @@ export const getConversationDetail = cache(
     const isDM = action.channel === "DM";
     const [canViewDM, threadKey] = await Promise.all([
       isDM ? isCurrentUserLead() : true,
-      getThreadKeyForAction(actionId),
+      getActivityThreadKey(actionId),
     ]);
 
     const messages = canViewDM ? await getConversation(actionId) : [];
@@ -80,14 +60,7 @@ export const getConversationDetail = cache(
 );
 
 async function fetchAnalyticsData(): Promise<AnalyticsData> {
-  let actions: BotAction[];
-  if (isStoreConfigured()) {
-    actions = await storeGetRecentActions(500);
-  } else {
-    actions = [...mockActions].sort(
-      (a, b) => (b.lastUpdated ?? b.timestamp) - (a.lastUpdated ?? a.timestamp)
-    );
-  }
+  const actions = await getActivityActions();
 
   const dayMs = 24 * 60 * 60 * 1000;
   const now = Date.now();
@@ -142,10 +115,8 @@ export const getAnalyticsData = cache(async (): Promise<AnalyticsData> => {
 });
 
 export const getDashboardStats = cache(async (): Promise<DashboardStats> => {
-  const [actions, stats] = await Promise.all([
-    getRecentActions(),
-    storeGetStats(),
-  ]);
+  const actions = await getRecentActions();
+  const stats = await getActivityStats();
 
   const counts: Record<string, number> = { ...stats };
   const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
@@ -164,7 +135,7 @@ export const getDashboardStats = cache(async (): Promise<DashboardStats> => {
 export const getActionCounts = cache(
   async (): Promise<Record<string, number>> => {
     await requireSession();
-    const stats = await storeGetStats();
+    const stats = await getActivityStats();
     return {
       all: stats.total,
       answered: stats.answered,
@@ -179,34 +150,14 @@ export const getActionCounts = cache(
 export const getChannelCounts = cache(
   async (): Promise<Record<string, number>> => {
     await requireSession();
-    if (!isStoreConfigured()) {
-      const counts: Record<string, number> = {};
-      for (const action of mockActions) {
-        if (action.channel) {
-          const name = action.channel.replace(LEADING_HASH_RE, "");
-          counts[name] = (counts[name] || 0) + 1;
-        }
-      }
-      return counts;
-    }
-    const actions = await storeGetRecentActions(500);
-    const counts: Record<string, number> = {};
-    for (const action of actions) {
-      if (action.channel) {
-        const name = action.channel.replace(LEADING_HASH_RE, "");
-        counts[name] = (counts[name] || 0) + 1;
-      }
-    }
-    return counts;
+    return getActivityChannelCounts();
   }
 );
 
 export const getLastSeenTimestamp = cache(async (): Promise<number> => {
-  const session = await auth.api
-    .getSession({ headers: await headers() })
-    .catch(() => null);
+  const session = await getCurrentSession().catch(() => null);
   if (!session?.user?.id) {
     return 0;
   }
-  return getLastSeen(session.user.id);
+  return getActivityLastSeen(session.user.id);
 });
