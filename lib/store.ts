@@ -62,7 +62,7 @@ export async function logAction(
 ): Promise<string | undefined> {
   const client = getRedis();
   if (!client) {
-    return undefined;
+    return;
   }
 
   if (threadKey) {
@@ -121,7 +121,7 @@ export async function logAction(
     return id;
   } catch (error) {
     logger.error("Failed to log action", { error: safeErrorMessage(error) });
-    return undefined;
+    return;
   }
 }
 
