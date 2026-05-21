@@ -1,17 +1,13 @@
 import { shouldUseMockActivity } from "@/data/queries/activity-source";
 import { getCurrentSession } from "@/data/queries/auth";
-import {
-  getActiveStreams,
-  hasActionForThread,
-  isStoreConfigured,
-} from "@/lib/store";
+import { getActiveStreams, hasActionForThread } from "@/lib/store";
 
 export async function GET() {
   const session = await getCurrentSession();
   if (!session) {
     return Response.json([], { status: 401 });
   }
-  if (shouldUseMockActivity() || !isStoreConfigured()) {
+  if (shouldUseMockActivity()) {
     return Response.json([]);
   }
 

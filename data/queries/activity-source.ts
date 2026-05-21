@@ -1,10 +1,10 @@
 import { mockActions, mockConversations } from "@/data/mock/activity";
 import { config } from "@/lib/config";
 import {
+  type ActionStats,
   getLastSeen,
   getThreadKeyForAction as getStoreThreadKeyForAction,
   isStoreConfigured,
-  type ActionStats,
   getActionById as storeGetActionById,
   getConversation as storeGetConversation,
   getRecentActions as storeGetRecentActions,
@@ -96,7 +96,7 @@ export async function getActivityStats(): Promise<ActionStats> {
     return countActions(getMockActions());
   }
 
-  return storeGetStats();
+  return await storeGetStats();
 }
 
 export async function getActivityChannelCounts(): Promise<
@@ -114,7 +114,7 @@ export async function getActivityLastSeen(userId: string): Promise<number> {
     return 0;
   }
 
-  return getLastSeen(userId);
+  return await getLastSeen(userId);
 }
 
 export async function getActivityThreadKey(
@@ -124,5 +124,5 @@ export async function getActivityThreadKey(
     return null;
   }
 
-  return getStoreThreadKeyForAction(actionId);
+  return await getStoreThreadKeyForAction(actionId);
 }

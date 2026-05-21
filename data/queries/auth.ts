@@ -8,7 +8,7 @@ type AuthSession = NonNullable<Awaited<ReturnType<typeof auth.api.getSession>>>;
 
 function getDemoSession(): AuthSession {
   const now = new Date();
-  return {
+  const demo: AuthSession = {
     session: {
       id: "demo-session",
       token: "demo-session-token",
@@ -28,7 +28,8 @@ function getDemoSession(): AuthSession {
       createdAt: now,
       updatedAt: now,
     },
-  } as AuthSession;
+  };
+  return demo;
 }
 
 export const getCurrentSession = cache(

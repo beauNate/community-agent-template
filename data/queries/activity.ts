@@ -1,5 +1,13 @@
 import { cache } from "react";
 import { isCurrentUserLead } from "@/lib/auth";
+import type {
+  AnalyticsBucket,
+  AnalyticsData,
+  BotAction,
+  ConversationDetail,
+  ConversationMessage,
+  DashboardStats,
+} from "@/lib/types";
 import {
   getActivityActionById,
   getActivityActions,
@@ -9,14 +17,6 @@ import {
   getActivityStats,
   getActivityThreadKey,
 } from "./activity-source";
-import type {
-  AnalyticsBucket,
-  AnalyticsData,
-  BotAction,
-  ConversationDetail,
-  ConversationMessage,
-  DashboardStats,
-} from "@/lib/types";
 import { getCurrentSession, requireSession } from "./auth";
 
 export const getRecentActions = cache(async (): Promise<BotAction[]> => {

@@ -1,6 +1,6 @@
 import { shouldUseMockActivity } from "@/data/queries/activity-source";
 import { getCurrentSession } from "@/data/queries/auth";
-import { getStreamByThreadKey, isStoreConfigured } from "@/lib/store";
+import { getStreamByThreadKey } from "@/lib/store";
 
 export async function GET(
   _req: Request,
@@ -10,7 +10,7 @@ export async function GET(
   if (!session) {
     return Response.json(null, { status: 401 });
   }
-  if (shouldUseMockActivity() || !isStoreConfigured()) {
+  if (shouldUseMockActivity()) {
     return Response.json(null);
   }
 
