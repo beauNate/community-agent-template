@@ -1,4 +1,3 @@
-import { chat } from "@/lib/chat";
 import { createLogger } from "@/lib/logger";
 import { getSlackClient } from "@/lib/slack";
 import {
@@ -22,6 +21,7 @@ export async function stepPostToSlack(
 ): Promise<void> {
   "use step";
 
+  const { chat } = await import("@/lib/chat");
   const slackAdapter = chat.getAdapter("slack");
   const threadId = slackAdapter.encodeThreadId({
     channel: slack.channelId,

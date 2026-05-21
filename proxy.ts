@@ -1,5 +1,6 @@
 import { getSessionCookie } from "better-auth/cookies";
 import { type NextRequest, NextResponse } from "next/server";
+import { config as appConfig } from "./lib/config";
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -12,6 +13,10 @@ export function proxy(request: NextRequest) {
   }
 
   if (pathname.startsWith("/api/") || pathname.startsWith("/sign-in")) {
+    return NextResponse.next();
+  }
+
+  if (appConfig.adminDemoMode) {
     return NextResponse.next();
   }
 

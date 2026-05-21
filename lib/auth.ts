@@ -37,6 +37,10 @@ export const auth = betterAuth({
 });
 
 export async function isCurrentUserLead(): Promise<boolean> {
+  if (config.adminDemoMode) {
+    return true;
+  }
+
   if (!config.communityLeadSlackId) {
     return false;
   }

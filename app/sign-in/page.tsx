@@ -1,5 +1,7 @@
-import { ExternalLink, Info } from "lucide-react";
+import { ArrowRight, ExternalLink, Info } from "lucide-react";
+import Link from "next/link";
 import { Suspense } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -13,6 +15,31 @@ import { SignInButton } from "./sign-in-button";
 const PROTOCOL_RE = /^https?:\/\//;
 
 export default function SignInPage() {
+  if (config.adminDemoMode) {
+    return (
+      <div className="flex min-h-screen items-center justify-center p-4">
+        <Card className="w-full max-w-sm">
+          <CardHeader className="text-center">
+            <CardTitle className="text-xl">
+              {config.communityName} Demo
+            </CardTitle>
+            <CardDescription>
+              Browse the template with mock activity before connecting Slack.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button asChild className="w-full">
+              <Link href="/">
+                View demo dashboard
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
       <Card className="w-full max-w-sm">
