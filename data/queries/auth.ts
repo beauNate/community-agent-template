@@ -1,21 +1,24 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { cache } from "react";
 import { auth } from "@/lib/auth";
 import { config } from "@/lib/config";
 
 type AuthSession = NonNullable<Awaited<ReturnType<typeof auth.api.getSession>>>;
 
+const DEMO_SESSION_CREATED_AT = new Date("2026-01-01T00:00:00.000Z");
+const DEMO_SESSION_EXPIRES_AT = new Date("2099-01-01T00:00:00.000Z");
+
 function getDemoSession(): AuthSession {
-  const now = new Date();
   const demo: AuthSession = {
     session: {
       id: "demo-session",
       token: "demo-session-token",
       userId: "demo-user",
-      expiresAt: new Date(now.getTime() + 24 * 60 * 60 * 1000),
-      createdAt: now,
-      updatedAt: now,
+      expiresAt: DEMO_SESSION_EXPIRES_AT,
+      createdAt: DEMO_SESSION_CREATED_AT,
+      updatedAt: DEMO_SESSION_CREATED_AT,
       ipAddress: null,
       userAgent: null,
     },
@@ -25,8 +28,8 @@ function getDemoSession(): AuthSession {
       email: "demo@example.com",
       emailVerified: true,
       image: null,
-      createdAt: now,
-      updatedAt: now,
+      createdAt: DEMO_SESSION_CREATED_AT,
+      updatedAt: DEMO_SESSION_CREATED_AT,
     },
   };
   return demo;
@@ -35,6 +38,7 @@ function getDemoSession(): AuthSession {
 export const getCurrentSession = cache(
   async (): Promise<AuthSession | null> => {
     if (config.adminDemoMode) {
+      await connection();
       return getDemoSession();
     }
 
